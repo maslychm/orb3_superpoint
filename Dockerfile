@@ -15,7 +15,8 @@ RUN apt-get update && \
     libgl1-mesa-glx libegl1-mesa libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6 \
     libopenmpi-dev \
     libglu1-mesa-dev freeglut3-dev mesa-common-dev libglew-dev \
-    ccache curl
+    ccache curl \
+    libssl-dev
 
 # install anaconda from https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh
 RUN wget https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh \
