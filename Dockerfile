@@ -39,6 +39,7 @@ ENV USE_CUDA=0
 ENV NO_CUDA=1
 ENV USE_MKLDNN=0
 ENV USE_MKL=0
+# TODO enable MKL and CUDA
 RUN git clone --recursive -b v1.0.1 https://github.com/pytorch/pytorch \
     && cd pytorch \
     && mkdir build \

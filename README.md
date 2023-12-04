@@ -1,3 +1,23 @@
+# Docker container for ORB SLAM 3 with superpoint
+- Currently no CUDA and no MKL (which means it is extremely slow)
+- Builds TorchLib, OpenCV, Pangolin, ORB_SLAM3 
+
+## To build docker container
+On host machine (make sure to download and mount datasets and vocabulary):
+```bash
+git clone https://github.com/maslychm/orb3_superpoint
+docker build -t orb3_sp .
+docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/mykola/datasets/:/datasets/ -e DISPLAY=unix$DISPLAY --gpus=all --net=host orb3_sp
+```
+
+In container:
+```bash
+cd orb3_superpoint
+/Examples/Monocular/mono_tum /datasets/superpoint_voc.yml Examples/Monocular/TUM1.yaml /datasets/rgbd_dataset_freiburg1_xyz/
+```
+
+## OLDER
+
 This repository was forked from ORB-SLAM3 https://github.com/raulmur/ORB_SLAM3. SuperPoint-SLAM is a modified version of ORB-SLAM3 which use SuperPoint as its feature detector and descriptor. The pre-trained model of SuperPoint come from https://github.com/MagicLeapResearch/SuperPointPretrainedNetwork.
 This version is supposed to work with ORB-SLAM3 instead of ORB-SLAM2. This version is not optimised and might not outperfom ORB-SLAM3.
 
