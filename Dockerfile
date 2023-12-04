@@ -2,7 +2,7 @@ FROM nvidia/cuda:11.6.2-base-ubuntu20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
+# # Install dependencies
 RUN apt-get update && \
     apt-get install --yes --no-install-recommends \
     ca-certificates wget unzip bzip2 cmake git build-essential pkg-config \
@@ -14,7 +14,35 @@ RUN apt-get update && \
     libboost-all-dev libboost-python-dev libboost-serialization-dev \
     libgl1-mesa-glx libegl1-mesa libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6 \
     libopenmpi-dev \
-    libglu1-mesa-dev freeglut3-dev mesa-common-dev libglew-dev
+    libglu1-mesa-dev freeglut3-dev mesa-common-dev libglew-dev \
+    ccache curl
+
+# install anaconda from https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh
+RUN wget https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh \
+    && bash Anaconda3-2023.09-0-Linux-x86_64.sh -b \
+    && rm Anaconda3-2023.09-0-Linux-x86_64.sh
+
+ENV PATH /root/anaconda3/bin:$PATH
+RUN conda init
+
+# Create and configure the Conda environment
+# RUN conda create --name torchenv python=3.8 -y \
+#     && echo "source activate torchenv" > ~/.bashrc \
+#     && /root/anaconda3/bin/conda init bash
+
+RUN conda create --name torchenv python=3.8 -y
+RUN /root/anaconda3/bin/conda run -n torchenv conda install pyyaml=5.1 numpy mkl=2019.4 mkl-include=2020.0 setuptools cmake cffi typing
+
+# install torchlib
+ENV USE_CUDA=0
+ENV NO_CUDA=1
+ENV USE_MKLDNN=0
+ENV USE_MKL=0
+RUN git clone --recursive -b v1.0.1 https://github.com/pytorch/pytorch \
+    && cd pytorch \
+    && mkdir build \
+    && cd build \
+    && /root/anaconda3/bin/conda run -n torchenv /bin/bash -c "USE_CUDA=0 python ../tools/build_libtorch.py"
 
 # Install OpenCV
 RUN mkdir -p /build/opencv && cd /build/opencv
@@ -38,33 +66,7 @@ RUN git clone https://github.com/stevenlovegrove/Pangolin \
     && make -j \
     && make install
 
-# install anaconda from https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh
-RUN wget https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh \
-    && bash Anaconda3-2023.09-0-Linux-x86_64.sh -b \
-    && rm Anaconda3-2023.09-0-Linux-x86_64.sh
-
-ENV PATH /root/anaconda3/bin:$PATH
-
-RUN conda update conda
-RUN conda update anaconda
-RUN conda update --all
-
-RUN source /root/.bashrc
-RUN conda deactivate
-RUN conda create --name torchenv python=3.8
-RUN conda activate torchenv
-RUN conda install pyyaml=5.1
-
-# install torchlib
-# TODO Figure out how to install torchlib in docker with cuda support
-RUN export USE_CUDA=0 
-RUN git clone --recursive -b v1.0.1 https://github.com/pytorch/pytorch \
-    && cd pytorch && mkdir build && cd build \
-    && python ../tools/build_libtorch.py
-
-# install orb3_superpoint
-RUN cd /
 RUN git clone https://github.com/maslychm/orb3_superpoint \
     && cd orb3_superpoint \
     && chmod +x build.sh \
-    && ./build.sh
+    && /root/anaconda3/bin/conda run -n torchenv /bin/bash -c "./build.sh"
