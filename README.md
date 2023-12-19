@@ -1,6 +1,6 @@
 # Docker container for ORB SLAM 3 with superpoint
 - Currently no CUDA and no MKL (which means it is extremely slow)
-- Builds TorchLib, OpenCV, Pangolin, ORB_SLAM3 
+- Builds TorchLib, OpenCV, Pangolin, ORB_SLAM3
 
 ## To build docker container
 On host machine (make sure to download and mount datasets and vocabulary):
@@ -13,7 +13,7 @@ docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/mykola/datasets/:/datas
 In container:
 ```bash
 cd orb3_superpoint
-/Examples/Monocular/mono_tum /datasets/superpoint_voc.yml Examples/Monocular/TUM1.yaml /datasets/rgbd_dataset_freiburg1_xyz/
+/Examples/Monocular/mono_kitti /datasets/superpoint_voc.yml.gz Examples/Monocular/KITTI04-12.yaml /datasets/kitti/04/
 ```
 
 ## OLDER
